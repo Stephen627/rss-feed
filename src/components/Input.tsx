@@ -23,8 +23,9 @@ const Input: FunctionComponent<Props> = (props) => {
 const styles = StyleSheet.create({
   input: {
     height: 40,
-    margin: 12,
-    borderWidth: 2,
+    width: '100%',
+    marginVertical: 12,
+    borderBottomWidth: 2,
     padding: 10,
     color: theme.darkText,
     borderColor: theme.darkSecondary,

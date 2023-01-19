@@ -1,19 +1,26 @@
 import CacheInterface from './CacheInterface';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
+/**
+ * @classdesc Uses the local storage for caching
+ */
 export default class LocalStorage<T> implements CacheInterface<T> {
-
-  public get(key: string): T|false {
-    const item = localStorage.getItem(key) ?? false
-
-    if (!item) {
+  /**
+   * @inheritdoc
+   */
+  public async get(key: string): Promise<T|false> {
+    const data = await AsyncStorage.getItem(key)
+    if (!data)
       return false
-    }
 
-    return JSON.parse(item) as T
+    return JSON.parse(data)
   }
 
-  public set(key: string, value: T): void {
-    localStorage.setItem(key, JSON.stringify(value))
+  /**
+   * @inheritdoc
+   */
+  public async set(key: string, value: T): Promise<void> {
+    return await AsyncStorage.setItem(key, JSON.stringify(value))
   }
 }
 

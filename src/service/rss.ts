@@ -1,9 +1,9 @@
 import FeedFetchError from '../error/FeedFetchError'
 import Channel from '../interface/channel'
 import { __ } from '../lang'
-import xml2js from 'xml2js'
 import dayjs from 'dayjs'
 import Item from '../interface/item'
+import { XMLParser} from 'fast-xml-parser'
 
 function handleError(err: unknown): void {
   console.error(err)
@@ -14,18 +14,23 @@ function handleError(err: unknown): void {
   throw new FeedFetchError(__(`rss.error.${err.name.replace(' ', '-').toLowerCase()}`))
 }
 
-export async function fetchFeed(url: string): Promise<false | Channel> {
+export interface FeedResponse {
+  url: string
+  channel: Channel
+}
+
+export async function fetchFeed(url: string): Promise<false | FeedResponse> {
   try {
     const response = await fetch(url);
     const data = await response.text();
+    
+    const parser = new XMLParser()
+    const jsObj = parser.parse(data)
 
-    const jsonObj = await xml2js.parseStringPromise(data, {
-      trim: true,
-      explicitRoot: false,
-      explicitArray: false,
-    })
-
-    return castTypesForChannel(jsonObj.channel)
+    return {
+      url,
+      channel: castTypesForChannel(jsObj?.rss?.channel)
+    }
   } catch (err) { handleError(err) }
 
   return false
